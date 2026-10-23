@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm test
+
+  action-smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Título válido
+        id: ok
+        uses: ./
+        with:
+          title: 'feat(api)!: drop v1 endpoints'
+          comment: 'false'
+      - name: Verificar salidas del título válido
+        run: |
+          test "${{ steps.ok.outputs.valid }}" = "true"
+          test "${{ steps.ok.outputs.type }}" = "feat"
+          test "${{ steps.ok.outputs.scope }}" = "api"
+          test "${{ steps.ok.outputs.bump }}" = "major"
+
+      - name: Título inválido (se espera que falle)
+        id: bad
+        continue-on-error: true
+        uses: ./
+        with:
+          title: 'Login page crashes'
+          labels: 'bug'
+          comment: 'false'
+      - name: Verificar salidas del título inválido
+        run: |
+          test "${{ steps.bad.outcome }}" = "failure"
+          test "${{ steps.bad.outputs.valid }}" = "false"
+          test "${{ steps.bad.outputs.suggested-title }}" = "fix: login page crashes"
