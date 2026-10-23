@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Conventional PR Check - Opciones</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { max-width: 560px; margin: 32px auto; padding: 0 16px; font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+    label { display: block; margin: 16px 0 4px; font-weight: 600; }
+    input { width: 100%; box-sizing: border-box; padding: 6px 8px; font: 13px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    button { margin-top: 12px; padding: 5px 14px; font: inherit; cursor: pointer; }
+    .hint { color: GrayText; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>Conventional PR Check</h1>
+  <p>La extensión muestra un panel en las páginas de pull request de GitHub cuando el título no sigue Conventional Commits, con un título sugerido.</p>
+  <label for="token">Token de GitHub</label>
+  <input id="token" type="password" autocomplete="off" placeholder="github_pat_...">
+  <p class="hint">Necesario para aplicar el título con un clic y para repositorios privados. Usa un token de acceso detallado (fine-grained) con permiso <strong>Pull requests: Read and write</strong> en los repositorios donde lo vayas a usar. El token se guarda solo en este navegador.</p>
+  <button id="save" type="button">Guardar</button>
+  <span id="status" class="hint"></span>
+  <script src="options.js"></script>
+</body>
+</html>

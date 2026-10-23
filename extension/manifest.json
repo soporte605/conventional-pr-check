@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Conventional PR Check",
+  "version": "0.2.0",
+  "description": "Valida el título de los pull requests de GitHub con Conventional Commits y lo corrige con un clic.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://api.github.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*"],
+      "js": ["lint.js", "content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html"
+}

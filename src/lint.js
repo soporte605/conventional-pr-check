@@ -183,7 +183,7 @@ function parseList(input) {
     .filter(Boolean);
 }
 
-module.exports = {
+const api = {
   DEFAULT_TYPES,
   DEFAULT_LABEL_MAP,
   parseTitle,
@@ -193,3 +193,9 @@ module.exports = {
   parseLabelMap,
   parseList,
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = api;
+} else {
+  globalThis.ConventionalPrLint = api;
+}

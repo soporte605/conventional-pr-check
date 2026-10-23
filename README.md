@@ -7,6 +7,7 @@ GitHub Action que valida que el título de cada pull request siga [Conventional 
 - Deduce el tipo sugerido a partir de las etiquetas del PR (`bug` → `fix`, `enhancement` → `feat`, ...), de prefijos mal escritos (`Feature:`, `[FIX]`, `bugfix -`) o de palabras clave (`Add ...`, `Fix ...`).
 - Expone el próximo bump SemVer: `major`, `minor`, `patch` o `none`.
 - Incluye una segunda Action, [`changelog`](#changelog), que arma las notas de versión desde el último release y calcula la siguiente versión.
+- Incluye una [extensión para el navegador](#extensión-para-el-navegador) que muestra el título sugerido en la página del PR y lo aplica con un clic.
 - Sin dependencias: JavaScript plano que corre en el runtime `node24` de Actions.
 
 ## Uso
@@ -156,15 +157,33 @@ Si solo hubo cambios que no generan versión (`docs`, `chore`, `ci`, ...), el bu
 | `pr-count` | PRs incluidos. |
 | `release-url` | URL del release creado, si se creó. |
 
+## Extensión para el navegador
+
+La carpeta [`extension/`](extension) es una extensión para Chrome, Edge y otros navegadores basados en Chromium. En cada página de pull request de GitHub muestra un panel abajo a la derecha:
+
+- Si el título es válido, indica el próximo bump SemVer.
+- Si no lo es, muestra los errores y un título sugerido (con la misma lógica de la Action, incluidas las etiquetas del PR), que se puede editar, copiar o **aplicar con un clic**.
+
+### Instalación
+
+1. Descarga `conventional-pr-check-extension.zip` del [último release](https://github.com/soporte605/conventional-pr-check/releases/latest) y descomprímelo.
+2. Abre `chrome://extensions` (o `edge://extensions`), activa el **Modo de desarrollador** y elige **Cargar descomprimida** con la carpeta.
+3. En las opciones de la extensión, pega un token de GitHub.
+
+El token es necesario para aplicar el título y para ver repositorios privados. Usa un [token detallado (fine-grained)](https://github.com/settings/personal-access-tokens/new) con permiso **Pull requests: Read and write** solo en los repositorios donde lo vas a usar. Se guarda únicamente en ese navegador. Sin token, el panel funciona en repositorios públicos y el botón Copiar sigue disponible.
+
 ## Desarrollo
 
 ```bash
 npm test
+npm run package:extension   # genera conventional-pr-check-extension.zip
 ```
+
+`extension/lint.js` es una copia de `src/lint.js` para que la extensión use exactamente la misma lógica; `npm run build:extension` la actualiza y las pruebas fallan si quedan distintas.
 
 El workflow [`ci.yml`](.github/workflows/ci.yml) corre las pruebas unitarias y pruebas de humo que ejecutan las dos Actions (`uses: ./` y `uses: ./changelog`). El workflow [`pr-title.yml`](.github/workflows/pr-title.yml) valida los títulos de los PRs de este mismo repositorio.
 
-Para publicar una versión: correr el workflow [`release.yml`](.github/workflows/release.yml) desde la pestaña Actions. Crea un release borrador con el changelog; al publicarlo desde GitHub se puede marcar "Publish this release to the GitHub Marketplace". Después, actualizar las referencias del README a la nueva versión.
+Para publicar una versión: correr el workflow [`release.yml`](.github/workflows/release.yml) desde la pestaña Actions. Crea un release borrador con el changelog y la extensión adjunta; al publicarlo desde GitHub se puede marcar "Publish this release to the GitHub Marketplace". Después, actualizar las referencias del README a la nueva versión.
 
 ## Licencia
 

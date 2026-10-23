@@ -17,6 +17,13 @@ jobs:
         with:
           create-release: true
           draft: true
+      - name: Adjuntar la extensión del navegador
+        if: steps.cl.outputs.release-url != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          npm run package:extension
+          gh release upload "${{ steps.cl.outputs.next-tag }}" conventional-pr-check-extension.zip --clobber
       - name: Resultado
         run: |
           echo "Bump: ${{ steps.cl.outputs.bump }}"
