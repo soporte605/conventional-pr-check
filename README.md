@@ -2,11 +2,11 @@
 
 GitHub Action que valida que el título de cada pull request siga [Conventional Commits](https://www.conventionalcommits.org/es/v1.0.0/), sugiere un título corregido cuando no lo hace y reporta el próximo bump de [SemVer](https://semver.org/lang/es/).
 
-- ✅ Valida títulos como `feat: ...`, `fix(api): ...`, `feat!: ...`.
-- 💬 Si el título es inválido, falla el check y deja **un** comentario en el PR con un título sugerido. El comentario se actualiza en cada intento y se borra cuando el título queda bien.
-- 🏷️ Deduce el tipo sugerido a partir de las etiquetas del PR (`bug` → `fix`, `enhancement` → `feat`, ...), de prefijos mal escritos (`Feature:`, `[FIX]`, `bugfix -`) o de palabras clave (`Add ...`, `Fix ...`).
-- 🔢 Expone el próximo bump SemVer: `major`, `minor`, `patch` o `none`.
-- 📒 Incluye una segunda Action, [`changelog`](#changelog), que arma las notas de versión desde el último release y calcula la siguiente versión.
+- Valida títulos como `feat: ...`, `fix(api): ...`, `feat!: ...`.
+- Si el título es inválido, falla el check y deja **un** comentario en el PR con un título sugerido. El comentario se actualiza en cada intento y se borra cuando el título queda bien.
+- Deduce el tipo sugerido a partir de las etiquetas del PR (`bug` → `fix`, `enhancement` → `feat`, ...), de prefijos mal escritos (`Feature:`, `[FIX]`, `bugfix -`) o de palabras clave (`Add ...`, `Fix ...`).
+- Expone el próximo bump SemVer: `major`, `minor`, `patch` o `none`.
+- Incluye una segunda Action, [`changelog`](#changelog), que arma las notas de versión desde el último release y calcula la siguiente versión.
 - Sin dependencias: JavaScript plano que corre en el runtime `node24` de Actions.
 
 ## Uso
@@ -121,11 +121,11 @@ Ejemplo de notas generadas:
 ```markdown
 ## v0.2.0 (2026-10-24)
 
-### ✨ Nuevas funciones
+### Nuevas funciones
 
 - **ui:** modo oscuro ([#12](https://github.com/acme/app/pull/12)) @ana
 
-### 🐛 Correcciones
+### Correcciones
 
 - error con títulos vacíos ([#11](https://github.com/acme/app/pull/11)) @luis
 ```

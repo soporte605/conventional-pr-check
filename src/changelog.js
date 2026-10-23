@@ -3,17 +3,17 @@
 const { parseTitle, semverBump } = require('./lint');
 
 const SECTIONS = [
-  ['feat', '✨ Nuevas funciones'],
-  ['fix', '🐛 Correcciones'],
-  ['perf', '⚡ Rendimiento'],
-  ['revert', '⏪ Reversiones'],
-  ['refactor', '♻️ Refactorización'],
-  ['docs', '📝 Documentación'],
-  ['test', '✅ Pruebas'],
-  ['build', '📦 Build'],
-  ['ci', '🔧 CI'],
-  ['style', '🎨 Estilo'],
-  ['chore', '🧹 Mantenimiento'],
+  ['feat', 'Nuevas funciones'],
+  ['fix', 'Correcciones'],
+  ['perf', 'Rendimiento'],
+  ['revert', 'Reversiones'],
+  ['refactor', 'Refactorización'],
+  ['docs', 'Documentación'],
+  ['test', 'Pruebas'],
+  ['build', 'Build'],
+  ['ci', 'CI'],
+  ['style', 'Estilo'],
+  ['chore', 'Mantenimiento'],
 ];
 
 const BUMP_ORDER = ['none', 'patch', 'minor', 'major'];
@@ -90,7 +90,7 @@ function renderChangelog(entries, options = {}) {
 
   const lines = [];
   if (options.heading) lines.push(`## ${options.heading}`, '');
-  if (breaking.length) lines.push('### ⚠️ Cambios incompatibles', '', ...breaking, '');
+  if (breaking.length) lines.push('### Cambios incompatibles', '', ...breaking, '');
   for (const [type, title] of SECTIONS) {
     const items = groups.get(type);
     if (items.length) lines.push(`### ${title}`, '', ...items, '');
