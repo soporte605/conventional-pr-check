@@ -1,0 +1,56 @@
+name: 'Conventional PR Changelog'
+description: 'Genera el changelog desde el último release a partir de los títulos de PR con Conventional Commits y calcula la siguiente versión.'
+author: 'Elikar Systems'
+branding:
+  icon: 'book-open'
+  color: 'green'
+
+inputs:
+  github-token:
+    description: 'Token para leer el repositorio. Necesita `contents: write` si `create-release` es `true`.'
+    required: false
+    default: ${{ github.token }}
+  from:
+    description: 'Tag desde el que se arma el changelog. Vacío = el tag de versión más alto (p. ej. `v0.1.0`).'
+    required: false
+    default: ''
+  to:
+    description: 'Commit, rama o tag hasta donde se arma el changelog. Vacío = el commit del workflow.'
+    required: false
+    default: ''
+  tag-prefix:
+    description: 'Prefijo de los tags de versión.'
+    required: false
+    default: 'v'
+  exclude-types:
+    description: 'Tipos que no se muestran en el changelog, separados por coma (p. ej. `chore,ci`). Usa `other` para ocultar títulos que no siguen la convención.'
+    required: false
+    default: ''
+  create-release:
+    description: 'Crear un release de GitHub con la siguiente versión y el changelog como notas.'
+    required: false
+    default: 'false'
+  draft:
+    description: 'Crear el release como borrador.'
+    required: false
+    default: 'false'
+
+outputs:
+  previous-tag:
+    description: 'Tag desde el que se armó el changelog (vacío si no había ninguno).'
+  bump:
+    description: 'Bump SemVer calculado: `major`, `minor`, `patch` o `none`.'
+  next-version:
+    description: 'Siguiente versión sin prefijo, p. ej. `0.2.0`.'
+  next-tag:
+    description: 'Siguiente tag con prefijo, p. ej. `v0.2.0`.'
+  changelog:
+    description: 'Changelog en Markdown.'
+  pr-count:
+    description: 'Cantidad de PRs incluidos.'
+  release-url:
+    description: 'URL del release creado, si se creó.'
+
+runs:
+  using: 'node24'
+  main: 'index.js'
