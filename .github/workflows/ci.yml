@@ -49,3 +49,20 @@ jobs:
           test "${{ steps.bad.outcome }}" = "failure"
           test "${{ steps.bad.outputs.valid }}" = "false"
           test "${{ steps.bad.outputs.suggested-title }}" = "fix: login page crashes"
+
+  changelog-smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generar changelog de este repositorio
+        id: cl
+        uses: ./changelog
+      - name: Verificar salidas del changelog
+        env:
+          CHANGELOG: ${{ steps.cl.outputs.changelog }}
+        run: |
+          test -n "${{ steps.cl.outputs.previous-tag }}"
+          test -n "${{ steps.cl.outputs.next-version }}"
+          test -n "$CHANGELOG"
+          test -z "${{ steps.cl.outputs.release-url }}"
