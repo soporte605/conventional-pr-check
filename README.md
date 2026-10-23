@@ -25,7 +25,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: soporte605/conventional-pr-check@v0
+      - uses: soporte605/conventional-pr-check@v0.1.0
         id: pr
       - run: |
           echo "Próximo bump: ${{ steps.pr.outputs.bump }}"
@@ -36,7 +36,7 @@ Incluye `edited` en los `types` para que el check se vuelva a correr cuando algu
 ### Configuración avanzada
 
 ```yaml
-      - uses: soporte605/conventional-pr-check@v0
+      - uses: soporte605/conventional-pr-check@v0.1.0
         with:
           types: feat,fix,docs,refactor,perf,test,ci,chore
           scopes: api,web,cli
@@ -96,7 +96,7 @@ npm test
 
 El workflow [`ci.yml`](.github/workflows/ci.yml) corre las pruebas unitarias y una prueba de humo que ejecuta la Action con `uses: ./`. El workflow [`pr-title.yml`](.github/workflows/pr-title.yml) valida los títulos de los PRs de este mismo repositorio.
 
-Para publicar una versión: crear el tag `v0.1.0` y mover el tag mayor `v0` a ese commit.
+Para publicar una versión: crear un release en GitHub con un tag nuevo (por ejemplo `v0.2.0`) y actualizar las referencias del README.
 
 ## Licencia
 
