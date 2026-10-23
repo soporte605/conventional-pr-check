@@ -1,11 +1,13 @@
 {
   "name": "conventional-pr-check",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "GitHub Action que valida títulos de PR con Conventional Commits y reporta el próximo bump SemVer.",
   "main": "src/index.js",
   "private": true,
   "scripts": {
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "build:extension": "cp src/lint.js extension/lint.js",
+    "package:extension": "npm run build:extension && cd extension && zip -qr ../conventional-pr-check-extension.zip ."
   },
   "engines": {
     "node": ">=20"
