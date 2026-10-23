@@ -1,0 +1,14 @@
+{
+  "name": "conventional-pr-check",
+  "version": "0.1.0",
+  "description": "GitHub Action que valida títulos de PR con Conventional Commits y reporta el próximo bump SemVer.",
+  "main": "src/index.js",
+  "private": true,
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}

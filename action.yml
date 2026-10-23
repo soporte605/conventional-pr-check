@@ -1,0 +1,66 @@
+name: 'Conventional PR Check'
+description: 'Valida que el título del PR siga Conventional Commits, sugiere un título corregido y reporta el próximo bump SemVer.'
+author: 'Elikar Systems'
+branding:
+  icon: 'check-circle'
+  color: 'green'
+
+inputs:
+  github-token:
+    description: 'Token para comentar en el PR. Necesita permiso `pull-requests: write`.'
+    required: false
+    default: ${{ github.token }}
+  types:
+    description: 'Tipos permitidos, separados por coma.'
+    required: false
+    default: 'feat,fix,docs,style,refactor,perf,test,build,ci,chore,revert'
+  scopes:
+    description: 'Scopes permitidos, separados por coma. Vacío = cualquier scope.'
+    required: false
+    default: ''
+  require-scope:
+    description: 'Exigir un scope, p. ej. `feat(api): ...`.'
+    required: false
+    default: 'false'
+  max-length:
+    description: 'Longitud máxima del título. 0 = sin límite.'
+    required: false
+    default: '0'
+  label-map:
+    description: 'Mapa etiqueta→tipo usado para sugerir títulos, formato `label:tipo,label:tipo`. Vacío = mapa por defecto (bug→fix, enhancement→feat, documentation→docs, ...).'
+    required: false
+    default: ''
+  default-type:
+    description: 'Tipo a sugerir cuando no se puede deducir de otra forma.'
+    required: false
+    default: 'chore'
+  comment:
+    description: 'Publicar (y luego borrar) un comentario con el título sugerido cuando el título es inválido.'
+    required: false
+    default: 'true'
+  title:
+    description: 'Título a validar en lugar del del PR (útil para pruebas o eventos que no son pull_request).'
+    required: false
+    default: ''
+  labels:
+    description: 'Etiquetas a usar junto con `title`, separadas por coma.'
+    required: false
+    default: ''
+
+outputs:
+  valid:
+    description: '`true` si el título es válido.'
+  type:
+    description: 'Tipo del título (p. ej. `feat`).'
+  scope:
+    description: 'Scope del título, si tiene.'
+  breaking:
+    description: '`true` si es un cambio que rompe compatibilidad (`!` o `BREAKING CHANGE:` en la descripción del PR).'
+  bump:
+    description: 'Próximo bump SemVer: `major`, `minor`, `patch` o `none`.'
+  suggested-title:
+    description: 'Título corregido sugerido (igual al actual si ya es válido).'
+
+runs:
+  using: 'node24'
+  main: 'src/index.js'
