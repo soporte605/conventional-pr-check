@@ -40,10 +40,10 @@ test('renderChangelog groups entries by type', () => {
   ], { heading: 'v1.0.0 (2026-10-23)' });
 
   assert.match(md, /^## v1\.0\.0 \(2026-10-23\)/);
-  assert.match(md, /### ⚠️ Cambios incompatibles\n\n- \*\*api:\*\* drop v1 \(\[#3\]\(https:\/\/x\/3\)\) @ana/);
-  assert.match(md, /### ✨ Nuevas funciones\n\n- \*\*api:\*\* drop v1/);
-  assert.match(md, /### 🐛 Correcciones\n\n- crash on empty title \(\[#2\]\(https:\/\/x\/2\)\) @luis/);
-  assert.match(md, /### 📝 Documentación\n\n- update readme/);
+  assert.match(md, /### Cambios incompatibles\n\n- \*\*api:\*\* drop v1 \(\[#3\]\(https:\/\/x\/3\)\) @ana/);
+  assert.match(md, /### Nuevas funciones\n\n- \*\*api:\*\* drop v1/);
+  assert.match(md, /### Correcciones\n\n- crash on empty title \(\[#2\]\(https:\/\/x\/2\)\) @luis/);
+  assert.match(md, /### Documentación\n\n- update readme/);
   assert.match(md, /### Otros cambios\n\n- Random title \(abcdef1\)/);
   assert.ok(md.indexOf('Nuevas funciones') < md.indexOf('Correcciones'));
 });

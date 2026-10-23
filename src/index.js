@@ -42,7 +42,7 @@ async function deleteComment(repo, number, token) {
 function failureComment(title, errors, suggestion) {
   return [
     COMMENT_MARKER,
-    '### ❌ El título del PR no sigue Conventional Commits',
+    '### El título del PR no sigue Conventional Commits',
     '',
     `**Título actual:** \`${title.replace(/`/g, "'")}\``,
     '',
@@ -62,10 +62,10 @@ function failureComment(title, errors, suggestion) {
 function summary(title, result, bump, suggestion) {
   const lines = ['## Conventional PR check', '', `**Título:** \`${title.replace(/`/g, "'")}\``, ''];
   if (result.valid) {
-    lines.push('✅ Título válido.', '', '| Tipo | Scope | Breaking | Bump SemVer |', '|---|---|---|---|');
+    lines.push('Título válido.', '', '| Tipo | Scope | Breaking | Bump SemVer |', '|---|---|---|---|');
     lines.push(`| \`${result.parsed.type}\` | ${result.parsed.scope ? `\`${result.parsed.scope}\`` : '—'} | ${result.parsed.breaking ? 'sí' : 'no'} | **${bump}** |`);
   } else {
-    lines.push('❌ Título inválido.', '', ...result.errors.map((e) => `- ${e}`), '', `**Sugerencia:** \`${suggestion}\``);
+    lines.push('Título inválido.', '', ...result.errors.map((e) => `- ${e}`), '', `**Sugerencia:** \`${suggestion}\``);
   }
   return `${lines.join('\n')}\n`;
 }
@@ -125,7 +125,7 @@ async function run() {
   }
 
   if (result.valid) {
-    console.log(`✅ "${title}" es válido (bump: ${bump}).`);
+    console.log(`"${title}" es válido (bump: ${bump}).`);
   } else {
     for (const e of result.errors) console.log(`::error::${e}`);
     console.log(`::error::Título sugerido: ${suggestion}`);
