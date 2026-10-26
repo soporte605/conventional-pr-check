@@ -1,16 +1,20 @@
 # Conventional PR Check
 
-GitHub Action que valida que el título de cada pull request siga [Conventional Commits](https://www.conventionalcommits.org/es/v1.0.0/), sugiere un título corregido cuando no lo hace y reporta el próximo bump de [SemVer](https://semver.org/lang/es/).
+**English** | [Español](README.es.md)
 
-- Valida títulos como `feat: ...`, `fix(api): ...`, `feat!: ...`.
-- Si el título es inválido, falla el check y deja **un** comentario en el PR con un título sugerido. El comentario se actualiza en cada intento y se borra cuando el título queda bien.
-- Deduce el tipo sugerido a partir de las etiquetas del PR (`bug` → `fix`, `enhancement` → `feat`, ...), de prefijos mal escritos (`Feature:`, `[FIX]`, `bugfix -`) o de palabras clave (`Add ...`, `Fix ...`).
-- Expone el próximo bump SemVer: `major`, `minor`, `patch` o `none`.
-- Incluye una segunda Action, [`changelog`](#changelog), que arma las notas de versión desde el último release y calcula la siguiente versión.
-- Incluye una [extensión para el navegador](#extensión-para-el-navegador) que muestra el título sugerido en la página del PR y lo aplica con un clic.
-- Sin dependencias: JavaScript plano que corre en el runtime `node24` de Actions.
+GitHub Action that checks that every pull request title follows [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), suggests a corrected title when it does not, and reports the next [SemVer](https://semver.org/) bump.
 
-## Uso
+- Validates titles such as `feat: ...`, `fix(api): ...`, `feat!: ...`.
+- If the title is invalid, the check fails and leaves **one** comment on the PR with a suggested title. The comment is updated on every attempt and deleted once the title is fixed.
+- Infers the suggested type from the PR labels (`bug` → `fix`, `enhancement` → `feat`, ...), from misspelled prefixes (`Feature:`, `[FIX]`, `bugfix -`) or from keywords (`Add ...`, `Fix ...`).
+- Outputs the next SemVer bump: `major`, `minor`, `patch` or `none`.
+- Ships a second Action, [`changelog`](#changelog), that builds release notes since the last release and computes the next version.
+- Ships a [browser extension](#browser-extension) that shows the suggested title on the PR page and applies it with one click.
+- No dependencies: plain JavaScript running on the Actions `node24` runtime.
+
+Messages, PR comments, generated release notes and the extension UI are in Spanish.
+
+## Usage
 
 ```yaml
 # .github/workflows/pr-title.yml
@@ -21,7 +25,7 @@ on:
     types: [opened, edited, synchronize, reopened, labeled, unlabeled]
 
 permissions:
-  pull-requests: write # para comentar el título sugerido
+  pull-requests: write # to comment the suggested title
 
 jobs:
   check:
@@ -30,12 +34,12 @@ jobs:
       - uses: soporte605/conventional-pr-check@v0.2.0
         id: pr
       - run: |
-          echo "Próximo bump: ${{ steps.pr.outputs.bump }}"
+          echo "Next bump: ${{ steps.pr.outputs.bump }}"
 ```
 
-Incluye `edited` en los `types` para que el check se vuelva a correr cuando alguien corrige el título, y `labeled`/`unlabeled` para que la sugerencia se actualice al cambiar etiquetas.
+Include `edited` in `types` so the check runs again when someone fixes the title, and `labeled`/`unlabeled` so the suggestion is refreshed when labels change.
 
-### Configuración avanzada
+### Advanced configuration
 
 ```yaml
       - uses: soporte605/conventional-pr-check@v0.2.0
@@ -49,50 +53,50 @@ Incluye `edited` en los `types` para que el check se vuelva a correr cuando algu
           comment: true
 ```
 
-## Reglas de bump SemVer
+## SemVer bump rules
 
-| Título | Bump |
+| Title | Bump |
 |---|---|
-| Cualquier tipo con `!` (`feat!:`, `fix(api)!:`) o `BREAKING CHANGE:` en la descripción del PR | `major` |
+| Any type with `!` (`feat!:`, `fix(api)!:`) or `BREAKING CHANGE:` in the PR description | `major` |
 | `feat` | `minor` |
 | `fix`, `perf` | `patch` |
-| Cualquier otro (`docs`, `chore`, `ci`, ...) | `none` |
+| Anything else (`docs`, `chore`, `ci`, ...) | `none` |
 
 ## Inputs
 
-| Nombre | Por defecto | Descripción |
+| Name | Default | Description |
 |---|---|---|
-| `github-token` | `${{ github.token }}` | Token para comentar. Necesita `pull-requests: write`. |
-| `types` | `feat,fix,docs,style,refactor,perf,test,build,ci,chore,revert` | Tipos permitidos. |
-| `scopes` | _(vacío)_ | Scopes permitidos. Vacío = cualquiera. |
-| `require-scope` | `false` | Exigir scope. |
-| `max-length` | `0` | Longitud máxima del título. `0` = sin límite. |
-| `label-map` | ver abajo | Mapa `etiqueta:tipo` para sugerir el tipo. |
-| `default-type` | `chore` | Tipo sugerido si no se puede deducir. |
-| `comment` | `true` | Comentar el título sugerido en el PR. |
-| `title` | _(vacío)_ | Validar este título en lugar del del PR (pruebas, otros eventos). |
-| `labels` | _(vacío)_ | Etiquetas a usar junto con `title`. |
+| `github-token` | `${{ github.token }}` | Token used to comment. Needs `pull-requests: write`. |
+| `types` | `feat,fix,docs,style,refactor,perf,test,build,ci,chore,revert` | Allowed types. |
+| `scopes` | _(empty)_ | Allowed scopes. Empty = any. |
+| `require-scope` | `false` | Require a scope. |
+| `max-length` | `0` | Maximum title length. `0` = no limit. |
+| `label-map` | see below | `label:type` map used to suggest the type. |
+| `default-type` | `chore` | Suggested type when none can be inferred. |
+| `comment` | `true` | Comment the suggested title on the PR. |
+| `title` | _(empty)_ | Validate this title instead of the PR title (tests, other events). |
+| `labels` | _(empty)_ | Labels to use together with `title`. |
 
-Mapa de etiquetas por defecto: `bug`, `fix` → `fix`; `enhancement`, `feature` → `feat`; `documentation`, `docs` → `docs`; `performance` → `perf`; `refactor` → `refactor`; `test`, `tests` → `test`; `ci` → `ci`; `build` → `build`; `dependencies`, `chore` → `chore`. Una etiqueta `breaking` o `breaking-change` agrega `!` a la sugerencia.
+Default label map: `bug`, `fix` → `fix`; `enhancement`, `feature` → `feat`; `documentation`, `docs` → `docs`; `performance` → `perf`; `refactor` → `refactor`; `test`, `tests` → `test`; `ci` → `ci`; `build` → `build`; `dependencies`, `chore` → `chore`. A `breaking` or `breaking-change` label adds `!` to the suggestion.
 
 ## Outputs
 
-| Nombre | Descripción |
+| Name | Description |
 |---|---|
 | `valid` | `true` / `false`. |
-| `type` | Tipo del título, p. ej. `feat`. |
-| `scope` | Scope, si tiene. |
-| `breaking` | `true` si es un cambio incompatible. |
-| `bump` | `major`, `minor`, `patch` o `none`. |
-| `suggested-title` | Título corregido (igual al actual si ya es válido). |
+| `type` | Title type, e.g. `feat`. |
+| `scope` | Scope, if any. |
+| `breaking` | `true` for a breaking change. |
+| `bump` | `major`, `minor`, `patch` or `none`. |
+| `suggested-title` | Corrected title (same as the current one if it is already valid). |
 
-## PRs desde forks
+## PRs from forks
 
-En PRs desde forks, `GITHUB_TOKEN` es de solo lectura y el comentario no se puede publicar. La Action lo avisa con un warning y el check sigue fallando o pasando según el título, con la sugerencia en los logs y en el resumen del job.
+On PRs from forks, `GITHUB_TOKEN` is read-only and the comment cannot be posted. The Action logs a warning and the check still passes or fails based on the title, with the suggestion in the logs and in the job summary.
 
 ## Changelog
 
-La Action `soporte605/conventional-pr-check/changelog` junta los PRs mergeados desde el último tag de versión (por ejemplo `v0.1.0`), los agrupa por tipo usando sus títulos y calcula la siguiente versión con las mismas reglas de bump. Opcionalmente crea el release de GitHub con ese changelog como notas.
+The `soporte605/conventional-pr-check/changelog` Action collects the PRs merged since the last version tag (for example `v0.1.0`), groups them by type using their titles and computes the next version with the same bump rules. Optionally it creates the GitHub release with that changelog as its notes.
 
 ```yaml
 # .github/workflows/release.yml
@@ -102,7 +106,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write # para crear el release
+  contents: write # to create the release
 
 jobs:
   release:
@@ -112,12 +116,12 @@ jobs:
         id: cl
         with:
           create-release: true
-          draft: true # revisas el borrador y lo publicas desde GitHub
+          draft: true # review the draft and publish it from GitHub
       - run: |
-          echo "Siguiente versión: ${{ steps.cl.outputs.next-tag }}"
+          echo "Next version: ${{ steps.cl.outputs.next-tag }}"
 ```
 
-Ejemplo de notas generadas:
+Example of generated notes:
 
 ```markdown
 ## v0.2.0 (2026-10-24)
@@ -131,60 +135,60 @@ Ejemplo de notas generadas:
 - error con títulos vacíos ([#11](https://github.com/acme/app/pull/11)) @luis
 ```
 
-Si solo hubo cambios que no generan versión (`docs`, `chore`, `ci`, ...), el bump es `none` y no se crea release. Los commits empujados directo a la rama, sin PR, aparecen con su primera línea; los que no siguen la convención van a "Otros cambios".
+If there were only changes that do not produce a version (`docs`, `chore`, `ci`, ...), the bump is `none` and no release is created. Commits pushed directly to the branch, without a PR, appear with their first line; those that do not follow the convention go under "Otros cambios" (other changes).
 
-### Inputs de `changelog`
+### `changelog` inputs
 
-| Nombre | Por defecto | Descripción |
+| Name | Default | Description |
 |---|---|---|
-| `github-token` | `${{ github.token }}` | Necesita `contents: write` si `create-release` es `true`. |
-| `from` | _(último tag de versión)_ | Tag desde el que se arma el changelog. |
-| `to` | _(commit del workflow)_ | Commit, rama o tag hasta donde se arma. |
-| `tag-prefix` | `v` | Prefijo de los tags de versión. |
-| `exclude-types` | _(vacío)_ | Tipos a ocultar, p. ej. `chore,ci`. `other` oculta los títulos que no siguen la convención. |
-| `create-release` | `false` | Crear el release con la siguiente versión. |
-| `draft` | `false` | Crear el release como borrador. |
+| `github-token` | `${{ github.token }}` | Needs `contents: write` when `create-release` is `true`. |
+| `from` | _(last version tag)_ | Tag to build the changelog from. |
+| `to` | _(workflow commit)_ | Commit, branch or tag to build up to. |
+| `tag-prefix` | `v` | Prefix of version tags. |
+| `exclude-types` | _(empty)_ | Types to hide, e.g. `chore,ci`. `other` hides titles that do not follow the convention. |
+| `create-release` | `false` | Create the release with the next version. |
+| `draft` | `false` | Create the release as a draft. |
 
-### Outputs de `changelog`
+### `changelog` outputs
 
-| Nombre | Descripción |
+| Name | Description |
 |---|---|
-| `previous-tag` | Tag desde el que se armó (vacío si no había). |
-| `bump` | `major`, `minor`, `patch` o `none`. |
-| `next-version` | Siguiente versión sin prefijo, p. ej. `0.2.0`. |
-| `next-tag` | Siguiente tag, p. ej. `v0.2.0`. |
-| `changelog` | Changelog en Markdown. |
-| `pr-count` | PRs incluidos. |
-| `release-url` | URL del release creado, si se creó. |
+| `previous-tag` | Tag the changelog was built from (empty if there was none). |
+| `bump` | `major`, `minor`, `patch` or `none`. |
+| `next-version` | Next version without prefix, e.g. `0.2.0`. |
+| `next-tag` | Next tag, e.g. `v0.2.0`. |
+| `changelog` | Changelog in Markdown. |
+| `pr-count` | Number of PRs included. |
+| `release-url` | URL of the created release, if any. |
 
-## Extensión para el navegador
+## Browser extension
 
-La carpeta [`extension/`](extension) es una extensión para Chrome, Edge y otros navegadores basados en Chromium. En cada página de pull request de GitHub muestra un panel abajo a la derecha:
+The [`extension/`](extension) folder is an extension for Chrome, Edge and other Chromium-based browsers. On every GitHub pull request page it shows a panel in the bottom right corner:
 
-- Si el título es válido, indica el próximo bump SemVer.
-- Si no lo es, muestra los errores y un título sugerido (con la misma lógica de la Action, incluidas las etiquetas del PR), que se puede editar, copiar o **aplicar con un clic**.
+- If the title is valid, it shows the next SemVer bump.
+- If it is not, it lists the errors and a suggested title (using the same logic as the Action, including the PR labels) that can be edited, copied or **applied with one click**.
 
-### Instalación
+### Installation
 
-1. Descarga `conventional-pr-check-extension.zip` del [último release](https://github.com/soporte605/conventional-pr-check/releases/latest) y descomprímelo.
-2. Abre `chrome://extensions` (o `edge://extensions`), activa el **Modo de desarrollador** y elige **Cargar descomprimida** con la carpeta.
-3. En las opciones de la extensión, pega un token de GitHub.
+1. Download `conventional-pr-check-extension.zip` from the [latest release](https://github.com/soporte605/conventional-pr-check/releases/latest) and unzip it.
+2. Open `chrome://extensions` (or `edge://extensions`), turn on **Developer mode** and choose **Load unpacked** with the folder.
+3. In the extension options, paste a GitHub token.
 
-El token es necesario para aplicar el título y para ver repositorios privados. Usa un [token detallado (fine-grained)](https://github.com/settings/personal-access-tokens/new) con permiso **Pull requests: Read and write** solo en los repositorios donde lo vas a usar. Se guarda únicamente en ese navegador. Sin token, el panel funciona en repositorios públicos y el botón Copiar sigue disponible.
+The token is needed to apply the title and to see private repositories. Use a [fine-grained token](https://github.com/settings/personal-access-tokens/new) with **Pull requests: Read and write** permission only on the repositories where you will use it. It is stored only in that browser. Without a token, the panel works on public repositories and the Copy button is still available.
 
-## Desarrollo
+## Development
 
 ```bash
 npm test
-npm run package:extension   # genera conventional-pr-check-extension.zip
+npm run package:extension   # builds conventional-pr-check-extension.zip
 ```
 
-`extension/lint.js` es una copia de `src/lint.js` para que la extensión use exactamente la misma lógica; `npm run build:extension` la actualiza y las pruebas fallan si quedan distintas.
+`extension/lint.js` is a copy of `src/lint.js` so the extension uses exactly the same logic; `npm run build:extension` refreshes it and the tests fail if they drift apart.
 
-El workflow [`ci.yml`](.github/workflows/ci.yml) corre las pruebas unitarias y pruebas de humo que ejecutan las dos Actions (`uses: ./` y `uses: ./changelog`). El workflow [`pr-title.yml`](.github/workflows/pr-title.yml) valida los títulos de los PRs de este mismo repositorio.
+The [`ci.yml`](.github/workflows/ci.yml) workflow runs the unit tests and smoke tests that execute both Actions (`uses: ./` and `uses: ./changelog`). The [`pr-title.yml`](.github/workflows/pr-title.yml) workflow checks the PR titles of this repository.
 
-Para publicar una versión: correr el workflow [`release.yml`](.github/workflows/release.yml) desde la pestaña Actions. Crea un release borrador con el changelog y la extensión adjunta; al publicarlo desde GitHub se puede marcar "Publish this release to the GitHub Marketplace". Después, actualizar las referencias del README a la nueva versión.
+To publish a version: run the [`release.yml`](.github/workflows/release.yml) workflow from the Actions tab. It creates a draft release with the changelog and the extension attached; when publishing it from GitHub you can tick "Publish this release to the GitHub Marketplace". Then update the README references to the new version.
 
-## Licencia
+## License
 
 MIT
