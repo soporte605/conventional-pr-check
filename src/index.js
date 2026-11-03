@@ -15,10 +15,27 @@ const {
 
 const COMMENT_MARKER = '<!-- conventional-pr-check -->';
 
+// Solo se reutilizan comentarios propios: los de una cuenta bot (GITHUB_TOKEN o una
+// GitHub App) o, si el token es personal, los de esa misma cuenta.
+function isOwnComment(comment, login = '') {
+  if (!comment.body || !comment.body.includes(COMMENT_MARKER) || !comment.user) return false;
+  return login ? comment.user.login === login : comment.user.type === 'Bot';
+}
+
+async function tokenLogin(token) {
+  try {
+    const user = await github('GET', '/user', token);
+    return user && user.type !== 'Bot' ? user.login : '';
+  } catch (err) {
+    return '';
+  }
+}
+
 async function findComment(repo, number, token) {
+  const login = await tokenLogin(token);
   for (let page = 1; page <= 10; page += 1) {
     const comments = await github('GET', `/repos/${repo}/issues/${number}/comments?per_page=100&page=${page}`, token);
-    const found = comments.find((c) => c.body && c.body.includes(COMMENT_MARKER));
+    const found = comments.find((c) => isOwnComment(c, login));
     if (found) return found;
     if (comments.length < 100) return null;
   }
@@ -39,7 +56,7 @@ async function deleteComment(repo, number, token) {
   if (existing) await github('DELETE', `/repos/${repo}/issues/comments/${existing.id}`, token);
 }
 
-function failureComment(title, errors, suggestion) {
+function failureComment(title, errors, suggestion, pending = []) {
   return [
     COMMENT_MARKER,
     '### El título del PR no sigue Conventional Commits',
@@ -54,18 +71,20 @@ function failureComment(title, errors, suggestion) {
     suggestion,
     '```',
     '',
+    ...(pending.length ? ['El título sugerido todavía necesita ajustes:', '', ...pending.map((e) => `- ${e}`), ''] : []),
     'Formato: `tipo(scope opcional)!: descripción`. Usa `!` para cambios que rompen compatibilidad.',
     'Más info: https://www.conventionalcommits.org/es/v1.0.0/',
   ].join('\n');
 }
 
-function summary(title, result, bump, suggestion) {
+function summary(title, result, bump, suggestion, pending = []) {
   const lines = ['## Conventional PR check', '', `**Título:** \`${title.replace(/`/g, "'")}\``, ''];
   if (result.valid) {
     lines.push('Título válido.', '', '| Tipo | Scope | Breaking | Bump SemVer |', '|---|---|---|---|');
-    lines.push(`| \`${result.parsed.type}\` | ${result.parsed.scope ? `\`${result.parsed.scope}\`` : '—'} | ${result.parsed.breaking ? 'sí' : 'no'} | **${bump}** |`);
+    lines.push(`| \`${result.parsed.type}\` | ${result.parsed.scope ? `\`${result.parsed.scope}\`` : '—'} | ${bump === 'major' ? 'sí' : 'no'} | **${bump}** |`);
   } else {
     lines.push('Título inválido.', '', ...result.errors.map((e) => `- ${e}`), '', `**Sugerencia:** \`${suggestion}\``);
+    if (pending.length) lines.push('', 'La sugerencia todavía necesita ajustes:', '', ...pending.map((e) => `- ${e}`));
   }
   return `${lines.join('\n')}\n`;
 }
@@ -100,6 +119,7 @@ async function run() {
   const result = validateTitle(title, options);
   const bump = result.valid ? semverBump(result.parsed, !titleOverride && pr ? pr.body : '') : 'none';
   const suggestion = result.valid ? title.trim() : suggestTitle(title, options);
+  const pending = result.valid ? [] : validateTitle(suggestion, options).errors;
 
   setOutput('valid', result.valid);
   setOutput('type', result.parsed ? result.parsed.type : '');
@@ -107,17 +127,17 @@ async function run() {
   setOutput('breaking', result.parsed ? result.parsed.breaking || bump === 'major' : false);
   setOutput('bump', bump);
   setOutput('suggested-title', suggestion);
-  appendFile('GITHUB_STEP_SUMMARY', summary(title, result, bump, suggestion));
+  appendFile('GITHUB_STEP_SUMMARY', summary(title, result, bump, suggestion, pending));
 
   const token = getInput('github-token');
-  const shouldComment = getBoolean('comment', true) && pr && token && event.repository;
+  const shouldComment = getBoolean('comment', true) && pr && !titleOverride && token && event.repository;
   if (shouldComment) {
     const repo = event.repository.full_name;
     try {
       if (result.valid) {
         await deleteComment(repo, pr.number, token);
       } else {
-        await upsertComment(repo, pr.number, token, failureComment(title, result.errors, suggestion));
+        await upsertComment(repo, pr.number, token, failureComment(title, result.errors, suggestion, pending));
       }
     } catch (err) {
       console.log(`::warning::No se pudo publicar el comentario: ${err.message}`);
@@ -129,6 +149,7 @@ async function run() {
   } else {
     for (const e of result.errors) console.log(`::error::${e}`);
     console.log(`::error::Título sugerido: ${suggestion}`);
+    for (const e of pending) console.log(`::warning::La sugerencia todavía necesita ajustes: ${e}`);
     process.exitCode = 1;
   }
 }
@@ -140,4 +161,6 @@ if (require.main === module) {
   });
 }
 
-module.exports = { run, failureComment, COMMENT_MARKER };
+module.exports = {
+  run, failureComment, isOwnComment, COMMENT_MARKER,
+};

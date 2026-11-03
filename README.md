@@ -74,7 +74,7 @@ Include `edited` in `types` so the check runs again when someone fixes the title
 | `label-map` | see below | `label:type` map used to suggest the type. |
 | `default-type` | `chore` | Suggested type when none can be inferred. |
 | `comment` | `true` | Comment the suggested title on the PR. |
-| `title` | _(empty)_ | Validate this title instead of the PR title (tests, other events). |
+| `title` | _(empty)_ | Validate this title instead of the PR title (tests, other events). No comment is posted when it is set. |
 | `labels` | _(empty)_ | Labels to use together with `title`. |
 
 Default label map: `bug`, `fix` → `fix`; `enhancement`, `feature` → `feat`; `documentation`, `docs` → `docs`; `performance` → `perf`; `refactor` → `refactor`; `test`, `tests` → `test`; `ci` → `ci`; `build` → `build`; `dependencies`, `chore` → `chore`. A `breaking` or `breaking-change` label adds `!` to the suggestion.

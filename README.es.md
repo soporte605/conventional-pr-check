@@ -72,7 +72,7 @@ Incluye `edited` en los `types` para que el check se vuelva a correr cuando algu
 | `label-map` | ver abajo | Mapa `etiqueta:tipo` para sugerir el tipo. |
 | `default-type` | `chore` | Tipo sugerido si no se puede deducir. |
 | `comment` | `true` | Comentar el título sugerido en el PR. |
-| `title` | _(vacío)_ | Validar este título en lugar del del PR (pruebas, otros eventos). |
+| `title` | _(vacío)_ | Validar este título en lugar del del PR (pruebas, otros eventos). Si se usa, no se publica comentario. |
 | `labels` | _(vacío)_ | Etiquetas a usar junto con `title`. |
 
 Mapa de etiquetas por defecto: `bug`, `fix` → `fix`; `enhancement`, `feature` → `feat`; `documentation`, `docs` → `docs`; `performance` → `perf`; `refactor` → `refactor`; `test`, `tests` → `test`; `ci` → `ci`; `build` → `build`; `dependencies`, `chore` → `chore`. Una etiqueta `breaking` o `breaking-change` agrega `!` a la sugerencia.

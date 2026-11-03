@@ -142,6 +142,8 @@ function suggestTitle(title, options = {}) {
     }
   }
 
+  if (scope && options.scopes && options.scopes.length && !options.scopes.includes(scope)) scope = null;
+
   if (!type) type = typeFromLabels(options.labels, labelMap, types);
 
   if (!type) {

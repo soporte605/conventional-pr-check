@@ -10,7 +10,7 @@
     "package:extension": "npm run build:extension && cd extension && zip -qr ../conventional-pr-check-extension.zip ."
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "license": "MIT"
 }

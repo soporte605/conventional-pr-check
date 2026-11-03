@@ -39,7 +39,7 @@ inputs:
     required: false
     default: 'true'
   title:
-    description: 'Título a validar en lugar del del PR (útil para pruebas o eventos que no son pull_request).'
+    description: 'Título a validar en lugar del del PR (útil para pruebas o eventos que no son pull_request). Si se usa, no se publica comentario.'
     required: false
     default: ''
   labels:

@@ -87,3 +87,9 @@ test('parseLabelMap parses custom maps', () => {
   assert.deepEqual(parseLabelMap('Bug:fix, type: feature:feat'), { bug: 'fix', 'type: feature': 'feat' });
   assert.equal(parseLabelMap('').bug, 'fix');
 });
+
+test('suggestTitle drops scopes that are not allowed', () => {
+  assert.equal(suggestTitle('feat(foo): x', { scopes: ['api'] }), 'feat: x');
+  assert.equal(suggestTitle('feat(api) - x', { scopes: ['api'] }), 'feat(api): x');
+  assert.equal(validateTitle(suggestTitle('feat(foo): x', { scopes: ['api'] }), { scopes: ['api'] }).valid, true);
+});
