@@ -1,0 +1,40 @@
+name: Major tag
+
+# Mueve el tag de versión mayor (p. ej. `v0`) al último release publicado,
+# para que se pueda usar `soporte605/conventional-pr-check@v0`.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag del release (vacío = el último release publicado).'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  move:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Mover el tag mayor
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          if [ -z "$TAG" ]; then
+            TAG=$(gh release view --json tagName --jq .tagName)
+          fi
+          if ! [[ "$TAG" =~ ^v([0-9]+)\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::$TAG no es un tag de versión vX.Y.Z"
+            exit 1
+          fi
+          MAJOR="v${BASH_REMATCH[1]}"
+          git tag -f "$MAJOR" "$TAG^{commit}"
+          git push -f origin "refs/tags/$MAJOR"
+          echo "$MAJOR ahora apunta a $TAG" >> "$GITHUB_STEP_SUMMARY"

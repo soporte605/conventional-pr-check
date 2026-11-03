@@ -31,18 +31,20 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: soporte605/conventional-pr-check@v0.2.0
+      - uses: soporte605/conventional-pr-check@v0
         id: pr
       - run: |
           echo "Next bump: ${{ steps.pr.outputs.bump }}"
 ```
+
+`@v0` always points to the latest `v0.x.y` release. Pin an exact version such as `@v0.2.0` if you prefer to update by hand.
 
 Include `edited` in `types` so the check runs again when someone fixes the title, and `labeled`/`unlabeled` so the suggestion is refreshed when labels change.
 
 ### Advanced configuration
 
 ```yaml
-      - uses: soporte605/conventional-pr-check@v0.2.0
+      - uses: soporte605/conventional-pr-check@v0
         with:
           types: feat,fix,docs,refactor,perf,test,ci,chore
           scopes: api,web,cli
@@ -112,7 +114,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: soporte605/conventional-pr-check/changelog@v0.2.0
+      - uses: soporte605/conventional-pr-check/changelog@v0
         id: cl
         with:
           create-release: true
@@ -187,7 +189,11 @@ npm run package:extension   # builds conventional-pr-check-extension.zip
 
 The [`ci.yml`](.github/workflows/ci.yml) workflow runs the unit tests and smoke tests that execute both Actions (`uses: ./` and `uses: ./changelog`). The [`pr-title.yml`](.github/workflows/pr-title.yml) workflow checks the PR titles of this repository.
 
-To publish a version: run the [`release.yml`](.github/workflows/release.yml) workflow from the Actions tab. It creates a draft release with the changelog and the extension attached; when publishing it from GitHub you can tick "Publish this release to the GitHub Marketplace". Then update the README references to the new version.
+To publish a version: run the [`release.yml`](.github/workflows/release.yml) workflow from the Actions tab. It creates a draft release with the changelog and the extension attached; when publishing it from GitHub you can tick "Publish this release to the GitHub Marketplace". The [`major-tag.yml`](.github/workflows/major-tag.yml) workflow then moves the `v0` tag to the new release, so users on `@v0` get it without changing anything. To publish the extension in the Chrome Web Store, follow [`store/README.md`](store/README.md).
+
+## Privacy
+
+The extension does not collect any data. See [PRIVACY.md](PRIVACY.md).
 
 ## License
 

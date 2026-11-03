@@ -22,8 +22,10 @@ test('manifest is valid and references existing files', () => {
   const files = [
     manifest.background.service_worker,
     manifest.options_page,
+    ...Object.values(manifest.icons || {}),
     ...manifest.content_scripts.flatMap((c) => [...c.js, ...(c.css || [])]),
   ];
+  assert.ok(manifest.icons && manifest.icons['128'], 'falta el icono de 128 px');
   for (const file of files) assert.ok(fs.existsSync(path.join(ext, file)), file);
 });
 
